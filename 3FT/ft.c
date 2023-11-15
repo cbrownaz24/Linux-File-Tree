@@ -175,6 +175,7 @@ int FT_insertDir(const char *pcPath) {
 
    assert(pcPath != NULL);
 
+   printf("insert FT");
    /* validate pcPath and generate a Path_T for it */
    if(!bIsInitialized)
       return INITIALIZATION_ERROR;
@@ -198,16 +199,14 @@ int FT_insertDir(const char *pcPath) {
       return CONFLICTING_PATH;
    }
 
-   /* ancestor node is a file */
-   if (Node_isFile(oNCurr)) {
-      Path_free(oPPath);
-      return NOT_A_DIRECTORY;
-   }
 
    ulDepth = Path_getDepth(oPPath);
    if(oNCurr == NULL) /* new root! */
       ulIndex = 1;
-   else {
+   else if (Node_isFile(oNCurr)) {
+      Path_free(oPPath);
+      return NOT_A_DIRECTORY;
+   } else {
       ulIndex = Path_getDepth(Node_getPath(oNCurr))+1;
 
       /* oNCurr is the node we're trying to insert */
@@ -271,7 +270,10 @@ boolean FT_containsDir(const char *pcPath) {
    assert(pcPath != NULL);
 
    iStatus = FT_findNode(pcPath, &oNFound);
-   return (boolean) (iStatus == SUCCESS && !Node_isFile(oNFound));
+   if (iStatus == SUCCESS) 
+      return (boolean) (!Node_isFile(oNFound));
+   else    
+      return FALSE;
 }
 
 
@@ -331,16 +333,14 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       return CONFLICTING_PATH;
    }
 
-   /* ancestor node is a file */
-   if (Node_isFile(oNCurr)) {
-      Path_free(oPPath);
-      return NOT_A_DIRECTORY;
-   }
 
    ulDepth = Path_getDepth(oPPath);
    if(oNCurr == NULL) { /* attempting to insert file as a root */
       Path_free(oPPath);
       return CONFLICTING_PATH;
+   } else if (Node_isFile(oNCurr)) {
+      Path_free(oPPath);
+      return NOT_A_DIRECTORY;
    } else {
       ulIndex = Path_getDepth(Node_getPath(oNCurr))+1;
 
@@ -416,7 +416,10 @@ boolean FT_containsFile(const char *pcPath) {
    assert(pcPath != NULL);
 
    iStatus = FT_findNode(pcPath, &oNFound);
-   return (boolean) (iStatus == SUCCESS && Node_isFile(oNFound));
+   if (iStatus == SUCCESS) 
+      return (boolean) Node_isFile(oNFound);
+   else  
+      return FALSE;
 }
 
 int FT_rmFile(const char *pcPath) {

@@ -80,7 +80,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
    int iStatus;
 
    assert(oPPath != NULL);
-   assert(oNParent == NULL);
+   /* assert(oNParent != NULL); */
 
    /* assert that content can only be passed if this new node is to be a
       file */
@@ -186,7 +186,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
 
    *poNResult = psNew;
 
-   assert(oNParent == NULL);
+   /* assert(oNParent == NULL); */
 
    return SUCCESS;
 }

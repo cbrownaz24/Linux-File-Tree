@@ -1,6 +1,7 @@
 GCC = gcc217
 
-all:testft
+all: testft
+
 clobber: clean
 	rm-f dynarray.o path.o ft_client.o nodeFT.o ft.o *~
 
