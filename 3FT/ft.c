@@ -175,7 +175,6 @@ int FT_insertDir(const char *pcPath) {
 
    assert(pcPath != NULL);
 
-   printf("insert FT");
    /* validate pcPath and generate a Path_T for it */
    if(!bIsInitialized)
       return INITIALIZATION_ERROR;
@@ -495,7 +494,7 @@ int FT_stat(const char *pcPath, boolean *pbIsFile, size_t *pulSize) {
        return iStatus;
    
    *pbIsFile = Node_isFile(oNFound);
-   if (pbIsFile)
+   if (*pbIsFile)
       *pulSize = Node_getContentSize(oNFound);
 
    return SUCCESS;
