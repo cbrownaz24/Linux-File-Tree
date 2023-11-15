@@ -132,6 +132,23 @@ the error manifests itself or is "noticed" by the client.
 What are your critiques of the given DT implementations, as
 specified in Step 2.5?
 
+- For improved modularity, an additional function that takes two 
+arguments can be created to Path_free the memory taken up by the first
+argument and set the second argument (a *Node_T) to NULL. Code of this
+format is reused across dtGood.c and nodeDTGood.c when returning exit
+statuses. A variant of this free / NULL-setting function can be written
+for when a path and a node need to be freed.
+
+- The above functionality can be called in a separate checker function
+that returns the correct return statuses based on invariants like in
+CheckerDT_isValid. This reduces the repetitive return code currently 
+present in both implementations. For Node_new in nodeDTGood.c, there is
+code about "validating the parent" that is similar to the checks we wrote
+and can be moved elsewhere for better readability.
+
+- In DT_insert within dtGood.c, a static helper function for path-level 
+traversal can help with rebuilding the path needed in inserting a 
+new directory.
 
 
 ------------------------------------------------------------------------
