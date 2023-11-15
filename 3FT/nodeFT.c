@@ -7,8 +7,7 @@
 #include <assert.h>
 #include <string.h>
 #include "dynarray.h"
-#include "nodeDT.h"
-#include "checkerDT.h"
+#include "nodeFT.h"
 
 /* A node in a DT */
 struct node {
@@ -20,6 +19,10 @@ struct node {
    DynArray_T oDChildren;
    /* the node is a file. if false, the node is a directory. */
    boolean isFile;
+   /* contents (only if file, otherwise NULL) */
+   void *pvContents;
+   /* size of content */
+   size_t ulContentSize;
 };
 
 
@@ -68,17 +71,20 @@ static int Node_compareString(const Node_T oNFirst,
   * ALREADY_IN_TREE if oNParent already has a child with this path
 */
 int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile, 
-                Node_T *poNResult) {
+            void *pvContents, size_t ulContentSize, Node_T *poNResult) {
    struct node *psNew;
    Path_T oPParentPath = NULL;
    Path_T oPNewPath = NULL;
    size_t ulParentDepth;
    size_t ulIndex;
-   size_t idx;
    int iStatus;
 
    assert(oPPath != NULL);
-   assert(oNParent == NULL || CheckerDT_Node_isValid(oNParent));
+   assert(oNParent == NULL);
+
+   /* assert that content can only be passed if this new node is to be a
+      file */
+   assert((pvContents == NULL && ulContentSize == 0) || isFile);
 
    /* allocate space for a new node */
    psNew = malloc(sizeof(struct node));
@@ -139,11 +145,14 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
    else {
       /* new node must be root */
       /* root cannot be a file */
-      /* can only create one "level" at a time */
-      if(Path_getDepth(psNew->oPPath) != 1 || isFile) {
+      if (isFile) {
          Path_free(psNew->oPPath);
          free(psNew);
          *poNResult = NULL;
+         return CONFLICTING_PATH;
+      }
+      /* can only create one "level" at a time */
+      if(Path_getDepth(psNew->oPPath) != 1) {
          return NO_SUCH_PATH;
       }
    }
@@ -169,13 +178,15 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
       }
    }
 
-    /* establish whether the node is a file or directory */
+    /* establish whether the new node is a file or directory */
     psNew->isFile = isFile;
+
+    psNew->pvContents = pvContents;
+    psNew->ulContentSize = ulContentSize;
 
    *poNResult = psNew;
 
-   assert(oNParent == NULL || CheckerDT_Node_isValid(oNParent));
-   assert(CheckerDT_Node_isValid(*poNResult));
+   assert(oNParent == NULL);
 
    return SUCCESS;
 }
@@ -185,7 +196,6 @@ size_t Node_free(Node_T oNNode) {
    size_t ulCount = 0;
 
    assert(oNNode != NULL);
-   assert(CheckerDT_Node_isValid(oNNode));
 
    /* remove from parent's list */
    if(oNNode->oNParent != NULL) {
@@ -198,8 +208,7 @@ size_t Node_free(Node_T oNNode) {
                                   ulIndex);
    }
 
-   /* recursively remove children if the node is not a file. */
-   
+   /* recursively remove children */
   while(DynArray_getLength(oNNode->oDChildren) != 0) {
       ulCount += Node_free(DynArray_get(oNNode->oDChildren, 0));
     }
@@ -210,6 +219,7 @@ size_t Node_free(Node_T oNNode) {
    Path_free(oNNode->oPPath);
 
    /* finally, free the struct node */
+   free(oNNode->pvContents);
    free(oNNode);
    ulCount++;
    return ulCount;
@@ -232,6 +242,50 @@ boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
   return DynArray_bsearch(oNParent->oDChildren,
           (char*) Path_getPathname(oPPath), pulChildID,
           (int (*)(const void*,const void*)) Node_compareString);
+}
+
+boolean Node_isFile(Node_T oNNode) {
+   assert(oNNode != NULL);
+
+   return oNNode->isFile;
+}
+
+void *Node_getContent(Node_T oNNode) {
+   assert(oNNode != NULL);
+
+   return oNNode->pvContents;
+}
+
+size_t Node_getContentSize(Node_T oNNode) {
+   assert(oNNode != NULL);
+
+   return oNNode->ulContentSize;
+}
+
+void *Node_setContent(Node_T oNNode, void *pvNewContent) {
+   void *pvPreviousContent;
+
+   assert(oNNode != NULL);
+
+   if (!Node_isFile(oNNode)) return NULL;
+
+   pvPreviousContent = oNNode->pvContents;
+   oNNode->pvContents = pvNewContent;
+
+   return pvPreviousContent;
+}
+
+size_t Node_setContentSize(Node_T oNNode, size_t ulNewContentSize) {
+   size_t ulPreviousContentSize;
+
+   assert(oNNode != NULL);
+
+   if (!Node_isFile(oNNode)) return 0;
+
+   ulPreviousContentSize = oNNode->ulContentSize;
+   oNNode->ulContentSize = ulNewContentSize;
+
+   return ulPreviousContentSize;
 }
 
 size_t Node_getNumChildren(Node_T oNParent) {

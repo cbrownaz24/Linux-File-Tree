@@ -10,7 +10,6 @@
 #include "a4def.h"
 #include "path.h"
 
-
 /* A Node_T is a node in a Directory Tree */
 typedef struct node *Node_T;
 
@@ -27,7 +26,7 @@ typedef struct node *Node_T;
   * ALREADY_IN_TREE if oNParent already has a child with this path
 */
 int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile, 
-    Node_T *poNResult);
+            void *pvContents, size_t ulContentSize, Node_T *poNResult);
 
 /*
   Destroys and frees all memory allocated for the subtree rooted at
@@ -50,6 +49,25 @@ Path_T Node_getPath(Node_T oNNode);
 */
 boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
                          size_t *pulChildID);
+
+/* Returns TRUE if oNNode is a file, FALSE if directory. */
+boolean Node_isFile(Node_T oNNode);
+
+/* Returns the contents of oNNode. */
+void *Node_getContent(Node_T oNNode);
+
+/* Returns the content size of oNNode. */
+size_t Node_getContentSize(Node_T oNNode);
+
+/* Replaces the content of oNNode with pvNewContent, only if oNNode is
+   a file. Returns the previous content, if oNNode is a file, or NULL,
+   if oNNode is a directory. */
+void *Node_setContent(Node_T oNNode, void *pvNewContent);
+
+/* Replaces the content size of oNNode with ulNewContentSize, only if 
+   oNNode is a file. Returns the previous content size, if oNNode is a 
+   file, or 0, if oNNode is a directory. */
+size_t Node_setContentSize(Node_T oNNode, size_t ulNewContentSize);
 
 /* Returns the number of children that oNParent has. */
 size_t Node_getNumChildren(Node_T oNParent);
