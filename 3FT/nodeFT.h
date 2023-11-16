@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
 /* nodeDT.h                                                           */
-/* Author: Christopher Moretti                                        */
+/* Author: Connor Brown and Laura Hwa                                 */
 /*--------------------------------------------------------------------*/
 
 #ifndef NODE_INCLUDED
@@ -10,20 +10,23 @@
 #include "a4def.h"
 #include "path.h"
 
-/* A Node_T is a node in a Directory Tree */
+/* A Node_T is a node in a File Tree */
 typedef struct node *Node_T;
 
 /*
-  Creates a new node in the Directory Tree, with path oPPath and
-  parent oNParent. Returns an int SUCCESS status and sets *poNResult
-  to be the new node if successful. Otherwise, sets *poNResult to NULL
-  and returns status:
+  Creates a new node with path oPPath and parent oNParent. If isFile is 
+  TRUE, new node is created as a file with content pvContents and 
+  content size ulContentSize. If isFile is FALSE, contents is 
+  initialized to NULL and content size 0. Returns an int SUCCESS status 
+  and sets *poNResult to be the new node if successful. Otherwise, sets 
+  *poNResult to NULL and returns status:
   * MEMORY_ERROR if memory could not be allocated to complete request
   * CONFLICTING_PATH if oNParent's path is not an ancestor of oPPath
   * NO_SUCH_PATH if oPPath is of depth 0
                  or oNParent's path is not oPPath's direct parent
                  or oNParent is NULL but oPPath is not of depth 1
   * ALREADY_IN_TREE if oNParent already has a child with this path
+  * NOT_A_DIRECTORY if oNParent is a file
 */
 int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile, 
             void *pvContents, size_t ulContentSize, Node_T *poNResult);
@@ -53,10 +56,12 @@ boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
 /* Returns TRUE if oNNode is a file, FALSE if directory. */
 boolean Node_isFile(Node_T oNNode);
 
-/* Returns the contents of oNNode. */
+/* Returns the contents of oNNode. If oNNode is a directory, returns 
+   NULL. */
 void *Node_getContent(Node_T oNNode);
 
-/* Returns the content size of oNNode. */
+/* Returns the content size of oNNode. If oNNode is a directory, returns 
+   0. */
 size_t Node_getContentSize(Node_T oNNode);
 
 /* Replaces the content of oNNode with pvNewContent, only if oNNode is
@@ -77,6 +82,7 @@ size_t Node_getNumChildren(Node_T oNParent);
   node of oNParent with identifier ulChildID, if one exists.
   Otherwise, sets *poNResult to NULL and returns status:
   * NO_SUCH_PATH if ulChildID is not a valid child for oNParent
+  * NOT_A_DIRECTORY if oNParent is a file
 */
 int Node_getChild(Node_T oNParent, size_t ulChildID,
                   Node_T *poNResult);

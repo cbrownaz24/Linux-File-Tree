@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
-/* nodeDT.c                                                           */
-/* Author: Christopher Moretti                                        */
+/* nodeFT.c                                                           */
+/* Author: Connor Brown and Laura Hwa                                 */
 /*--------------------------------------------------------------------*/
 
 #include <stdlib.h>
@@ -9,7 +9,7 @@
 #include "dynarray.h"
 #include "nodeFT.h"
 
-/* A node in a DT */
+/* A node in a FT */
 struct node {
    /* the object corresponding to the node's absolute path */
    Path_T oPPath;
@@ -30,6 +30,7 @@ struct node {
   Links new child oNChild into oNParent's children array at index
   ulIndex. Returns SUCCESS if the new child was added successfully,
   or MEMORY_ERROR if allocation fails adding oNChild to the array.
+  Returns NOT_A_DIRECTORY if the parent is a file.
 */
 static int Node_addChild(Node_T oNParent, Node_T oNChild,
                          size_t ulIndex) {
@@ -58,18 +59,6 @@ static int Node_compareString(const Node_T oNFirst,
    return Path_compareString(oNFirst->oPPath, pcSecond);
 }
 
-
-/*
-  Creates a new node with path oPPath and parent oNParent.  Returns an
-  int SUCCESS status and sets *poNResult to be the new node if
-  successful. Otherwise, sets *poNResult to NULL and returns status:
-  * MEMORY_ERROR if memory could not be allocated to complete request
-  * CONFLICTING_PATH if oNParent's path is not an ancestor of oPPath
-  * NO_SUCH_PATH if oPPath is of depth 0
-                 or oNParent's path is not oPPath's direct parent
-                 or oNParent is NULL but oPPath is not of depth 1
-  * ALREADY_IN_TREE if oNParent already has a child with this path
-*/
 int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile, 
             void *pvContents, size_t ulContentSize, Node_T *poNResult) {
    struct node *psNew;
@@ -80,7 +69,6 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
    int iStatus;
 
    assert(oPPath != NULL);
-   /* assert(oNParent != NULL); */
 
    /* assert that content can only be passed if this new node is to be a
       file */
@@ -186,8 +174,6 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
 
    *poNResult = psNew;
 
-   /* assert(oNParent == NULL); */
-
    return SUCCESS;
 }
 
@@ -266,6 +252,7 @@ void *Node_setContent(Node_T oNNode, void *pvNewContent) {
 
    assert(oNNode != NULL);
 
+   /* only files can have content */
    if (!Node_isFile(oNNode)) return NULL;
 
    pvPreviousContent = oNNode->pvContents;
@@ -279,6 +266,7 @@ size_t Node_setContentSize(Node_T oNNode, size_t ulNewContentSize) {
 
    assert(oNNode != NULL);
 
+   /* only files can have a content size */
    if (!Node_isFile(oNNode)) return 0;
 
    ulPreviousContentSize = oNNode->ulContentSize;
