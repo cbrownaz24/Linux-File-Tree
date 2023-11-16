@@ -16,7 +16,7 @@
 
 
 /*
-  A Directory Tree is a representation of a hierarchy of directories,
+  A File Tree is a representation of a hierarchy of directories and files,
   represented as an AO with 3 state variables:
 */
 
@@ -198,7 +198,6 @@ int FT_insertDir(const char *pcPath) {
       return CONFLICTING_PATH;
    }
 
-
    ulDepth = Path_getDepth(oPPath);
    if(oNCurr == NULL) /* new root! */
       ulIndex = 1;
@@ -229,10 +228,6 @@ int FT_insertDir(const char *pcPath) {
             (void) Node_free(oNFirstNew);
          return iStatus;
       }
-
-
-
-      
 
       /* insert the new node for this level */
       iStatus = Node_new(oPPrefix, oNCurr, FALSE, NULL, 0, &oNNewNode);
@@ -274,7 +269,6 @@ boolean FT_containsDir(const char *pcPath) {
    else    
       return FALSE;
 }
-
 
 int FT_rmDir(const char *pcPath) {
    int iStatus;
@@ -332,7 +326,6 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       return CONFLICTING_PATH;
    }
 
-
    ulDepth = Path_getDepth(oPPath);
    if(oNCurr == NULL) { /* attempting to insert file as a root */
       Path_free(oPPath);
@@ -365,10 +358,6 @@ int FT_insertFile(const char *pcPath, void *pvContents,
          
          return iStatus;
       }
-
-
-
-      
 
       /* insert the new node for this level */
       /* if end of path, make the node a FILE, not a directory  */
@@ -404,7 +393,6 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       oNRoot = oNFirstNew;
    ulCount += ulNewNodes;
 
-   
    return SUCCESS;
 }
 

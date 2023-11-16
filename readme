@@ -112,6 +112,17 @@ your disagreements with them? Copy the splint warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
+checkerDT.c:56:11: Variable oNInspect used before definition
+  An rvalue is used that may not be initialized to a value on some execution
+  path. (Use -usedef to inhibit warning)
+checkerDT.c:70:40: Variable oNInspect1 used before definition
+checkerDT.c:71:40: Variable oNInspect2 used before definition
+checkerDT.c:85:40: Variable oNInspect1 used before definition
+checkerDT.c:86:40: Variable oNInspect2 used before definition
+
+- For all of the above, the functions Node_getChild and Node_getPath
+ guarantee that these variables are defined before they are used.
+
 dtGood.c: (in function DT_traversePath)
 dtGood.c:94:42: Variable ulChildID used before definition
   An rvalue is used that may not be initialized to a value on some execution
@@ -125,12 +136,13 @@ with the correct index for where the child was found or where it should be.
 nodeDTGood.c: (in function Node_new)
 nodeDTGood.c:148:48: Variable ulIndex used before definition
 
-- Same reasoning as first warning. (Node_hasChild was used earlier)
+- Same reasoning as second warning. (Node_hasChild was used earlier)
 
 nodeDTGood.c: (in function Node_free)
 nodeDTGood.c:180:35: Variable ulIndex used before definition
 
-- Same reasoning as first warning, but from DynArray_bsearch function.
+- Same reasoning as second warning, but from DynArray_bsearch function 
+used earlier.
 
 path.h:94:13: Function exported but not used outside path: Path_getComponent
   A declaration is exported, but not used outside this module. Declaration can
@@ -155,8 +167,8 @@ express your disagreement after each warning. If there are no
 warnings, then write "None."
 
 nodeFT.c:
-      nodeFT.c:160:48: Variable ulIndex used before definition
-      nodeFT.c:194:35: Variable ulIndex used before definition
+      nodeFT.c:173:48: Variable ulIndex used before definition
+      nodeFT.c:207:35: Variable ulIndex used before definition
 
       We immediately disagree with these warnings because they also 
       show up in nodeDTGood.c. But looking at the code more deeply, it's
@@ -169,8 +181,8 @@ nodeFT.c:
 
 ft.c: 
       ft.c:93:42: Variable ulChildID used before definition
-      ft.c:220:10: Variable ulIndex used before definition
-      ft.c:355:10: Variable ulIndex used before definition
+      ft.c:219:10: Variable ulIndex used before definition
+      ft.c:348:10: Variable ulIndex used before definition
 
       We disagree with the above warnings for the exact same reasons as 
       stated above, verbatim.

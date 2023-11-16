@@ -22,10 +22,10 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    size_t childArrSize;
 
    /* For use in lexicographical check and non-duplicate children check. */
-   Node_T oNInspect1 = malloc(sizeof(Node_T));
-   Node_T oNInspect2 = malloc(sizeof(Node_T));
-   Path_T oPInspectPath1 = malloc(sizeof(Path_T));
-   Path_T oPInspectPath2 = malloc(sizeof(Path_T)); 
+   Node_T oNInspect1;
+   Node_T oNInspect2;
+   Path_T oPInspectPath1;
+   Path_T oPInspectPath2; 
 
    /* Sample check: a NULL pointer is not a valid node */
    if(oNNode == NULL) {
@@ -51,7 +51,7 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    /* POINTER CHECK: oNNode's children's all recognize oNNode as it's parent.*/
    childArrSize = Node_getNumChildren(oNNode);
    for (ulIndex = 0; ulIndex < childArrSize; ulIndex++) {
-      Node_T oNInspect = malloc(sizeof(Node_T));
+      Node_T oNInspect;
       Node_getChild(oNNode, ulIndex, &oNInspect);
       if (oNInspect != NULL) {
          if (Node_compare(oNNode, Node_getParent(oNInspect)) != 0) {
