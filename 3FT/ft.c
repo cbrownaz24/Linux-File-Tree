@@ -475,7 +475,10 @@ void *FT_replaceFileContents(const char *pcPath, void *pvNewContents,
 
    /* record the previous pvContents and update content size */
    pvPreviousContents = Node_setContent(oNFound, pvNewContents);
-   Node_setContentSize(oNFound, ulNewLength);
+
+   /* update the content size of file. function return value is casted 
+   to void since it is not stored */
+   (void) Node_setContentSize(oNFound, ulNewLength); 
 
    /* returns the old pvContents */
    return pvPreviousContents;
@@ -486,7 +489,8 @@ int FT_stat(const char *pcPath, boolean *pbIsFile, size_t *pulSize) {
    Node_T oNFound = NULL;
 
    assert(pcPath != NULL);
-   
+   assert(pbIsFile != NULL);
+   assert(pulSize != NULL);
 
    iStatus = FT_findNode(pcPath, &oNFound);
 
