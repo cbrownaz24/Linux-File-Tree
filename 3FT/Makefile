@@ -2,8 +2,8 @@ GCC = gcc217
 
 all: testft
 
-clobber: clean
-	rm-f dynarray.o path.o ft_client.o nodeFT.o ft.o *~
+clean:
+	rm -f meminfo* dynarray.o path.o ft_client.o nodeFT.o ft.o *~
 
 testft: dynarray.o path.o nodeFT.o ft.o ft_client.o
 	$(GCC) -g $^ -o $@
