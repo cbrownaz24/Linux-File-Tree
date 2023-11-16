@@ -94,7 +94,10 @@ programs.
 Student 2: What is your assessment of the assignment? Was it helpful?
 Was it fun?
 
-
+This assignment had a steep learning curve to become familiar with the
+existing APIs. However, after reading through what the functions do,
+specifically the path.c and path.h files, I could better understand the
+needed functionality of file tree invariants.
 
 ------------------------------------------------------------------------
 (optional) What information can you provide about your submission that
@@ -109,7 +112,33 @@ your disagreements with them? Copy the splint warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
+dtGood.c: (in function DT_traversePath)
+dtGood.c:94:42: Variable ulChildID used before definition
+  An rvalue is used that may not be initialized to a value on some execution
+  path. (Use -usedef to inhibit warning)
 
+- ulChildID is defined by the outcome of the Node_hasChild function which
+stores the ulChildID in function's third argument. Based on the nodeDT.h
+specification for Node_hasChild, ulChildID will always be defined, either
+with the correct index for where the child was found or where it should be. 
+
+nodeDTGood.c: (in function Node_new)
+nodeDTGood.c:148:48: Variable ulIndex used before definition
+
+- Same reasoning as first warning. (Node_hasChild was used earlier)
+
+nodeDTGood.c: (in function Node_free)
+nodeDTGood.c:180:35: Variable ulIndex used before definition
+
+- Same reasoning as first warning, but from DynArray_bsearch function.
+
+path.h:94:13: Function exported but not used outside path: Path_getComponent
+  A declaration is exported, but not used outside this module. Declaration can
+  use static qualifier. (Use -exportlocal to inhibit warning)
+   path.c:316:1: Definition of Path_getComponent
+
+- Assignment specs said that we can assume path.h, path.c, dynarray.c, and
+dynarray.h are correct. 
 
 ------------------------------------------------------------------------
 What warnings does critTer generate on checkerDT.c, and what are your
@@ -117,7 +146,7 @@ disagreements with them? Copy the critTer warnings here, and express
 your disagreement after each warning. If there are no warnings, then
 write "None."
 
-
+None.
 
 ------------------------------------------------------------------------
 What warnings does splint generate on your Part 3 code, and what are

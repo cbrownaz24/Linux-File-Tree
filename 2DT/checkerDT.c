@@ -1,11 +1,12 @@
 /*--------------------------------------------------------------------*/
 /* checkerDT.c                                                        */
-/* Author:                                                            */
+/* Author: Laura Hwa and Connor Brown                                 */
 /*--------------------------------------------------------------------*/
 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "checkerDT.h"
 #include "dynarray.h"
 #include "path.h"
@@ -18,7 +19,13 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    Path_T oPNPath; /* node path */
    Path_T oPPPath; /* parent path */
    size_t ulIndex;
-   size_t childArrSize; 
+   size_t childArrSize;
+
+   /* For use in lexicographical check and non-duplicate children check. */
+   Node_T oNInspect1 = malloc(sizeof(Node_T));
+   Node_T oNInspect2 = malloc(sizeof(Node_T));
+   Path_T oPInspectPath1 = malloc(sizeof(Path_T));
+   Path_T oPInspectPath2 = malloc(sizeof(Path_T)); 
 
    /* Sample check: a NULL pointer is not a valid node */
    if(oNNode == NULL) {
@@ -41,12 +48,10 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       }
    }
 
-   /* COUNT CHECK: Node_getNumChildren returns a number equal to the*/
-
    /* POINTER CHECK: oNNode's children's all recognize oNNode as it's parent.*/
    childArrSize = Node_getNumChildren(oNNode);
    for (ulIndex = 0; ulIndex < childArrSize; ulIndex++) {
-      Node_T oNInspect;
+      Node_T oNInspect = malloc(sizeof(Node_T));
       Node_getChild(oNNode, ulIndex, &oNInspect);
       if (oNInspect != NULL) {
          if (Node_compare(oNNode, Node_getParent(oNInspect)) != 0) {
@@ -54,15 +59,11 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
          return FALSE;
          }
       }
-   }
+   } 
 
    /* PATH CHECK: Children are in lexicographical order. */
    if (childArrSize > 1){
       for (ulIndex = 0; ulIndex < childArrSize - 1; ulIndex++) {
-         Node_T oNInspect1;
-         Node_T oNInspect2;
-         Path_T oPInspectPath1;
-         Path_T oPInspectPath2;
 
          Node_getChild(oNNode, ulIndex, &oNInspect1);
          Node_getChild(oNNode, ulIndex + 1, &oNInspect2);
@@ -79,11 +80,6 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       Assume lexicographical order check has passed. */
    if (childArrSize > 1) {
       for (ulIndex = 0; ulIndex < childArrSize - 1; ulIndex++) {
-         Node_T oNInspect1;
-         Node_T oNInspect2;
-         Path_T oPInspectPath1;
-         Path_T oPInspectPath2;
-
          Node_getChild(oNNode, ulIndex, &oNInspect1);
          Node_getChild(oNNode, ulIndex + 1, &oNInspect2);
          oPInspectPath1 = Node_getPath(oNInspect1);
@@ -112,12 +108,12 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
 */
 static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulCounter) {
    size_t ulIndex;
-   /* check for double counting but increment counter as needed.
-   ensure increment is only once per treecheck call. */
+   assert(pulCounter != NULL);
 
    if(oNNode!= NULL) {
       /* Increment counter of nodes seen. */
       (*pulCounter)++;
+
       /* fprintf(stderr, "counter: %d", *pulCounter); */
       /* Sample check on each node: node must be valid */
       /* If not, pass that failure back up immediately */
@@ -151,8 +147,8 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
                           size_t ulCount) {
    boolean result;
    size_t *pulCounter = malloc(sizeof(size_t));
+   assert(pulCounter != NULL);
    (*pulCounter) = 0;
-   /* fprintf(stderr, "reported count: %d", ulCount); */
 
    /* check that ulCount matches the pointer to int*/
    /* Sample check on a top-level data structure invariant:
