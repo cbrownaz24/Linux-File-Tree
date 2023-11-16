@@ -17,7 +17,19 @@ information given in the "Policies" web page (also available on armlab
 in the file ~cos217/AuthorizedSourcesList ) to this section of the
 readme file, and edit it as appropriate.
 
+The course's lectures.
 
+The course's precepts.
+
+The course's website.
+
+Documents that are referenced directly by the course's website. 
+Such documents include the course's lecture slides and precept handouts.
+
+The course's current staff members outside of class time through 
+office hours.
+
+The course's current staff members outside of class time through Ed.
 
 ------------------------------------------------------------------------
 Student 2: What authorized sources of information did you use to
@@ -26,7 +38,19 @@ information given in the "Policies" web page (also available on armlab
 in the file ~cos217/AuthorizedSourcesList ) to this section of the
 readme file, and edit it as appropriate.
 
+The course's lectures.
 
+The course's precepts.
+
+The course's website.
+
+Documents that are referenced directly by the course's website. 
+Such documents include the course's lecture slides and precept handouts.
+
+The course's current staff members outside of class time through 
+office hours.
+
+The course's current staff members outside of class time through Ed.
 
 ------------------------------------------------------------------------
 Student 1: What unauthorized sources of information did you use to
@@ -60,7 +84,11 @@ None
 Student 1: What is your assessment of the assignment? Was it helpful?
 Was it fun?
 
-
+I'd say that, although frustating, this assignment was actually quite 
+helpful. The sheer amount of code in the API implementation was 
+intimidating; but by the time I actually managed to read through all of 
+it, I felt more comfortable with navigating such complex multi-file 
+programs. 
 
 ------------------------------------------------------------------------
 Student 2: What is your assessment of the assignment? Was it helpful?
@@ -73,7 +101,7 @@ Was it fun?
 will help your grader to grade it in the most favorable light? In
 particular, what bugs are in your submission?
 
-
+N/A 
 
 ------------------------------------------------------------------------
 What warnings does splint generate for Part 2's checker, and what are
@@ -97,7 +125,26 @@ your disagreements with them? Copy the splint warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
+nodeFT.c:
+      nodeFT.c:160:48: Variable ulIndex used before definition
+      nodeFT.c:194:35: Variable ulIndex used before definition
 
+      We immediately disagree with these warnings because they also 
+      show up in nodeDTGood.c. But looking at the code more deeply, it's
+      clear that ulIndex is, in fact, defined by the time that this 
+      statement is executed. In both instances, Node_hasChild() is
+      called with &ulIndex as one of the arguments. Ultimately, this
+      results in the value of ulIndex being defined as either the index 
+      of the child, or the would-be index of the child, if it were 
+      present (see Dynarray_bsearch() for more detail).
+
+ft.c: 
+      ft.c:93:42: Variable ulChildID used before definition
+      ft.c:220:10: Variable ulIndex used before definition
+      ft.c:355:10: Variable ulIndex used before definition
+
+      We disagree with the above warnings for the exact same reasons as 
+      stated above, verbatim.
 
 ------------------------------------------------------------------------
 What warnings does critTer generate on your Part 3 code, and what are
@@ -105,7 +152,22 @@ your disagreements with them? Copy the critTer warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
+nodeFT.c:
+      nodeFT.c: line 262: medium priority:
+      Do you want to validate 'pvNewContent' through an assert?
 
+      We disagree with the warning since a file could have a NULL 
+      contents.
+
+ft.c:
+      ft.c: line 301: medium priority:
+      Do you want to validate 'pvContents' through an assert?
+
+      ft.c: line 463: medium priority:
+      Do you want to validate 'pvNewContents' through an assert?
+
+      We disagree with the warning since a file could have a NULL 
+      contents.
 
 ------------------------------------------------------------------------
 For each of the five faulty BDT implementations required by Step
@@ -149,6 +211,9 @@ and can be moved elsewhere for better readability.
 - In DT_insert within dtGood.c, a static helper function for path-level 
 traversal can help with rebuilding the path needed in inserting a 
 new directory.
+
+- Node_compare is not used anywhere else outside of nodeDTGood.c, so it
+  should be redefined as a static function.
 
 
 ------------------------------------------------------------------------
