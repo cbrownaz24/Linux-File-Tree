@@ -1,3 +1,3 @@
-# Assignment 4 - Directory and File Trees
+# Directory and File Trees
 
-This repository contains the provided files for Assignment 4.
+This project mimics the file tree hierarchy found in Unix-based OS.
